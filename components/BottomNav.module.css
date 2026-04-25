@@ -1,0 +1,37 @@
+.nav {
+  display: flex;
+  height: 100%;
+  border-top: 1px solid var(--mantine-color-default-border);
+  background: var(--mantine-color-body);
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--mantine-color-dimmed);
+  padding: 6px 4px;
+  transition: color 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab:active {
+  background: var(--mantine-color-default-hover);
+}
+
+.active {
+  color: var(--mantine-color-blue-filled);
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}

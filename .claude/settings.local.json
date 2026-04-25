@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(bun *)"
+      "Bash(bun *)",
+      "WebFetch(domain:mantine.dev)"
     ]
   }
 }
