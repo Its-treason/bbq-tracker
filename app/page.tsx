@@ -101,7 +101,16 @@ export default function OrderPage() {
       <Stack gap="md">
         <Title order={2}>Take Order</Title>
 
-        <Stack gap={6}>
+        <Stack
+          gap={6}
+          style={{
+            position: "sticky",
+            top: "var(--app-shell-header-offset, 0)",
+            zIndex: 2,
+            background: "var(--mantine-color-body)",
+            paddingBottom: "var(--mantine-spacing-xs)",
+          }}
+        >
           <Group justify="space-between" align="center">
             <Text size="sm" fw={600}>Participant</Text>
             <Button
@@ -194,16 +203,25 @@ export default function OrderPage() {
           </Stack>
         )}
 
-        <Button
-          size="lg"
-          fullWidth
-          onClick={handleAssign}
-          disabled={!participantId || totalItems === 0}
-          loading={assigning}
-          mt="xs"
+        <div
+          style={{
+            position: "sticky",
+            bottom: "var(--app-shell-footer-offset, 0)",
+            zIndex: 2,
+            background: "var(--mantine-color-body)",
+            paddingTop: "var(--mantine-spacing-xs)",
+          }}
         >
-          {totalItems > 0 ? `Assign (${totalItems} item${totalItems !== 1 ? "s" : ""})` : "Assign Order"}
-        </Button>
+          <Button
+            size="lg"
+            fullWidth
+            onClick={handleAssign}
+            disabled={!participantId || totalItems === 0}
+            loading={assigning}
+          >
+            {totalItems > 0 ? `Assign (${totalItems} item${totalItems !== 1 ? "s" : ""})` : "Assign Order"}
+          </Button>
+        </div>
       </Stack>
 
       <Modal

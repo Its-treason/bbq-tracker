@@ -13,6 +13,7 @@ import {
   Tooltip,
   Modal,
   Slider,
+  SegmentedControl,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons-react";
@@ -26,6 +27,18 @@ function groupByParticipant(orders: Order[]): Record<string, Order[]> {
   }, {});
 }
 
+function aggregateByItem(orders: Order[]): { item_name: string; quantity: number }[] {
+  const totals = new Map<string, number>();
+  for (const order of orders) {
+    totals.set(order.item_name, (totals.get(order.item_name) ?? 0) + order.quantity);
+  }
+  return [...totals.entries()]
+    .map(([item_name, quantity]) => ({ item_name, quantity }))
+    .sort((a, b) => a.item_name.localeCompare(b.item_name));
+}
+
+type ViewMode = "by-participant" | "by-item";
+
 export default function InProgressPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [confirmAll, setConfirmAll] = useState(false);
@@ -33,6 +46,7 @@ export default function InProgressPage() {
   const [completingAll, setCompletingAll] = useState(false);
   const [cancelTarget, setCancelTarget] = useState<Order | null>(null);
   const [cancelQty, setCancelQty] = useState(1);
+  const [viewMode, setViewMode] = useState<ViewMode>("by-participant");
 
   const load = useCallback(async () => {
     const res = await fetch("/api/orders");
@@ -97,6 +111,7 @@ export default function InProgressPage() {
 
   const grouped = groupByParticipant(orders);
   const participantNames = Object.keys(grouped).sort();
+  const itemTotals = aggregateByItem(orders);
 
   return (
     <>
@@ -116,11 +131,23 @@ export default function InProgressPage() {
           )}
         </Group>
 
+        {orders.length > 0 && (
+          <SegmentedControl
+            fullWidth
+            value={viewMode}
+            onChange={(v) => setViewMode(v as ViewMode)}
+            data={[
+              { label: "By Participant", value: "by-participant" },
+              { label: "By Item", value: "by-item" },
+            ]}
+          />
+        )}
+
         {orders.length === 0 ? (
           <Text c="dimmed" size="sm">
             No orders in progress.
           </Text>
-        ) : (
+        ) : viewMode === "by-participant" ? (
           participantNames.map((name) => (
             <Card key={name} withBorder padding="sm">
               <Text fw={700} mb="xs" size="sm" tt="uppercase" c="dimmed">
@@ -168,6 +195,21 @@ export default function InProgressPage() {
               </Stack>
             </Card>
           ))
+        ) : (
+          <Card withBorder padding="sm">
+            <Stack gap={6}>
+              {itemTotals.map(({ item_name, quantity }) => (
+                <Group key={item_name} justify="space-between" align="center" wrap="nowrap">
+                  <Text size="sm" truncate style={{ flex: 1, minWidth: 0 }}>
+                    {item_name}
+                  </Text>
+                  <Badge size="lg" variant="light" color="blue">
+                    ×{quantity}
+                  </Badge>
+                </Group>
+              ))}
+            </Stack>
+          </Card>
         )}
       </Stack>
 
